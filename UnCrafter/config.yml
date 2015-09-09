@@ -1,0 +1,57 @@
+# Config for UnCrafter
+# _
+# If Permissions aren't used, this plugin will allow all users to uncraft and all OPs to update and check
+# UnCrafting permission: "uncrafter.use.crafting"
+# UnSmelting permission: "uncrafter.use.smelting"
+# UnBrewing permission: "uncrafter.use.brewing"
+# UnEnchanting permission: "uncrafter.use.enchanting"
+# UnTrading permission: "uncrafter.use.trading"
+# Permission to get notified if an update is available: "uncrafter.update.notify"
+# Permission to automatically update this plugin: "uncrafer.update.download"
+# _
+# (Dis-)Allowing UnCrafting (and other Un- processes) is just as it sounds. Whether this part of the plugin is enabled
+# _
+# "notify_update_available" Sends a message to all with the perms (or if perms are disabled: to all ops) that an update
+# The auto update and install option has been removed as it is too unstable and hard to maintain.
+# _
+# "recycle_chance" This is the chance of getting your items back when using this plugin
+# This is applied per item
+# _
+# The blacklist causes this plugin to basically ignore all items in it. Specifically: All clicks with this item are ignored, and you cannot an item that uses it as an ingredient
+# Lower- and upper- case do not matter, for a list of items formatted correctly, goto: https://hub.spigotmc.org/javadocs/org/bukkit/Material.html
+# _
+# The worlds (In or Ex -clude list) accepts three values: "in", "ex", "none". (Quotation marks are not needed.)
+# "in" means use the include list: any world names listed here will be used, all other worlds will be ignored
+# "ex" means use the exclude list: any world names here will be ingored, all other worlds will be used
+# "none" disables this option
+# Case DOES Matter For Worlds!
+
+
+config_version: 1.8
+
+allow_uncrafting: true
+
+allow_unsmelting: true
+
+use_permissions: false
+
+notify_update_available: true
+
+recycle_chance: 0.9
+
+recycle_blacklist:
+- coal_ore
+- quartz_ore
+- redstone_ore
+- lapis_ore
+
+In_Or_Ex_clude_List_For_Worlds: none
+
+worlds_include_list:
+- world
+- world_nether
+- world_the_end
+
+worlds_exclude_list:
+- pvp
+- noUncrafting
