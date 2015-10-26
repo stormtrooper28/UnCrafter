@@ -1,9 +1,6 @@
 # Customize your messages! 
-# Color Codes are not supported
+# Color Codes using the & symbol are now supported
 # _
-# The Message about lost enchantments is hard-coded because it has some plural checks (enchantment vs enchantments)
-# _
-
 
 
 default_update_news: "The only thing new is what you haven't found from the version already on this server."

@@ -19,6 +19,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -74,6 +76,8 @@ public class UnCrafter extends JavaPlugin implements Listener {
 	// private String chat_clear_suffix;
 
 	// * * * * * * * * * * * * * * * * * * * *
+
+	private static String msgYML;
 
 	public UnCrafter plugin = this;
 	public Plugin plu = this;
@@ -157,16 +161,15 @@ public class UnCrafter extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 
-		if (getConfig().getDouble("config_version") != 1.7 && getConfig().getDouble("config_version") != 1.8
-				&& getConfig().getDouble("config_version") <= 1.6) // Update
-																	// Messages
+		if (getConfig().getDouble("config_version") <= 1.9) // Update
+															// Messages
 			// and delete
 			// SaveData
 			try {
 				Files.delete(Paths.get(getDataFolder().getAbsolutePath(), "SaveData.yml"));
-				Files.copy(Paths.get(getDataFolder().getAbsolutePath(), "Messages.yml"),
+				Files.copy(Paths.get(getDataFolder().getAbsolutePath(), msgYML),
 						Paths.get(getDataFolder().getAbsolutePath(), "OldMessages.yml"));
-				if (Files.deleteIfExists(Paths.get(getDataFolder().getAbsolutePath(), "Messages.yml")))
+				if (Files.deleteIfExists(Paths.get(getDataFolder().getAbsolutePath(), msgYML)))
 					getLogger()
 							.severe("Messages.yml was reset for version upgrade, update your Messages from OldMessages.yml!"
 									+ "Any messages not in the new Messages.yml are no longer used!");
@@ -222,6 +225,23 @@ public class UnCrafter extends JavaPlugin implements Listener {
 			public void run() {
 				reloadMessages();
 				reloadConfig();
+
+				String preLang = "en";
+
+				if (getConfig().get("allow_uncrafting") != null)
+					preLang = getConfig().getString("language");
+				else
+					getConfig().set("language", "EN");
+
+				if (preLang.toLowerCase().startsWith("s") || preLang.toLowerCase().startsWith("es"))
+					msgYML = "ESMessages.yml";
+				else if (preLang.toLowerCase().startsWith("g") || preLang.toLowerCase().startsWith("d"))
+					msgYML = "DEMessages.yml";
+				else if (preLang.toLowerCase().startsWith("f"))
+					msgYML = "FRMessages.yml";
+				else
+					msgYML = "Messages.yml";
+				getLogger().info("Using " + msgYML);
 
 				/* 1 */if (getConfig().get("allow_uncrafting") != null)
 					UnCrafter.allow_uncrafting = getConfig().getBoolean("allow_uncrafting");
@@ -446,7 +466,6 @@ public class UnCrafter extends JavaPlugin implements Listener {
 				return super.onPacketInAsync(sender, channel, packet);
 			}
 
-			@Override
 			public Object onPacketOutAsync(Player reciever, Channel channel, Object packet) {
 				if (eventWindowClass.isInstance(packet)) {
 					Object winID = eventWindowID.get(packet);
@@ -513,6 +532,30 @@ public class UnCrafter extends JavaPlugin implements Listener {
 		getConfig().set("unCraftingCount", unCraftingCount);
 	}
 
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
+		if (sender instanceof Player && cmd.toString().equalsIgnoreCase("uncraft")) {
+			if ((usePerm && sender.hasPermission("uncrafter.command")) || sender.isOp()) {
+				Player p = (Player) sender;
+				ItemStack item = p.getItemInHand();
+				short dura = item.getDurability();
+				String name = item.getType().toString();
+				if (dura != 0)
+					name = name + "#" + dura;
+				if (UnCrafter.isBlacklisted(item, name))
+					return false;
+				SlotType sType = SlotType.QUICKBAR;
+				Inventory inv = p.getInventory();
+				p.openInventory(inv);
+				UnDo.unCraftSmelt(item, name, p, sType, inv, inv, inv);
+				p.closeInventory();
+			}
+			return true;
+		}
+
+		return false;
+	}
+
 	@EventHandler
 	public void onNoSaveClick(InventoryClickEvent e) {
 		if (wobw.equalsIgnoreCase("black")) {
@@ -528,7 +571,33 @@ public class UnCrafter extends JavaPlugin implements Listener {
 		if (e.getView().getTopInventory().getItem(0) != null)
 			return;
 
-		UnDo.unCraftSmelt(e);
+		ItemStack item;
+		if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR)
+			item = e.getCurrentItem();
+		else if (e.getCursor() != null && e.getCursor().getType() != Material.AIR)
+			item = e.getCursor();
+		else
+			return;
+		short dura = item.getDurability();
+		String name = item.getType().toString();
+		if (dura != 0)
+			name = name + "#" + dura;
+
+		if (UnCrafter.isBlacklisted(item, name))
+			return;
+		Player p = (Player) e.getWhoClicked();
+
+		SlotType sType = e.getSlotType();
+
+		Inventory clickInv = e.getClickedInventory();
+
+		Inventory inv = p.getInventory();
+
+		Inventory getInv = e.getInventory();
+
+		if ((UnDo.unCraftSmelt(item, name, p, sType, clickInv, inv, getInv) != null)
+				? UnDo.unCraftSmelt(item, name, p, sType, clickInv, inv, getInv) : false)
+			e.setCancelled(true);
 
 	}
 
@@ -702,21 +771,35 @@ public class UnCrafter extends JavaPlugin implements Listener {
 
 	private void iniMessages() {
 		reloadMessages();
-		default_update_news = getMessages().getString("default_update_news");
-		no_updates_available = getMessages().getString("no_updates_available");
-		blacklist_not_found = getMessages().getString("blacklist_not_found");
-		world_include_list_invalid = getMessages().getString("world_include_list_invalid");
-		world_exclude_list_invalid = getMessages().getString("world_exclude_list_invalid");
-		checking_updates = getMessages().getString("checking_updates");
-		update_check_failed = getMessages().getString("update_check_failed");
-		update_check_complete = getMessages().getString("update_check_complete");
-		unBrewing_is_unsupported = getMessages().getString("unBrewing_is_unsupported");
-		unEnchanting_is_unsupported = getMessages().getString("unEnchanting_is_unsupported");
-		unTrading_is_unsupported = getMessages().getString("unTrading_is_unsupported");
-		not_enough_items_for_uncrafting = getMessages().getString("not_enough_items_for_uncrafting");
-		uncrafting_item_lost = getMessages().getString("uncrafting_item_lost");
-		unsmelting_item_lost = getMessages().getString("unsmelting_item_lost");
-		not_enough_items_for_unsmelting = getMessages().getString("not_enough_items_for_unsmelting");
+		default_update_news = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("default_update_news"));
+		no_updates_available = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("no_updates_available"));
+		blacklist_not_found = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("blacklist_not_found"));
+		world_include_list_invalid = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("world_include_list_invalid"));
+		world_exclude_list_invalid = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("world_exclude_list_invalid"));
+		checking_updates = ChatColor.translateAlternateColorCodes('&', getMessages().getString("checking_updates"));
+		update_check_failed = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("update_check_failed"));
+		update_check_complete = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("update_check_complete"));
+		unBrewing_is_unsupported = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("unBrewing_is_unsupported"));
+		unEnchanting_is_unsupported = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("unEnchanting_is_unsupported"));
+		unTrading_is_unsupported = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("unTrading_is_unsupported"));
+		not_enough_items_for_uncrafting = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("not_enough_items_for_uncrafting"));
+		uncrafting_item_lost = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("uncrafting_item_lost"));
+		unsmelting_item_lost = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("unsmelting_item_lost"));
+		not_enough_items_for_unsmelting = ChatColor.translateAlternateColorCodes('&',
+				getMessages().getString("not_enough_items_for_unsmelting"));
 	}
 
 	public void sendPacket(Player player, Object packet) {
@@ -749,14 +832,14 @@ public class UnCrafter extends JavaPlugin implements Listener {
 
 	public void reloadMessages() {
 		if (MessagesFile == null) {
-			MessagesFile = new File(getDataFolder(), "Messages.yml");
+			MessagesFile = new File(getDataFolder(), msgYML);
 		}
 		Messages = YamlConfiguration.loadConfiguration(MessagesFile);
 
 		Reader defConfigStream = null;
 		// Look for defaults in the jar
 		try {
-			defConfigStream = new InputStreamReader(this.getResource("Messages.yml"), "UTF8");
+			defConfigStream = new InputStreamReader(this.getResource(msgYML), "UTF8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -789,10 +872,10 @@ public class UnCrafter extends JavaPlugin implements Listener {
 	// implement backup with following
 	public void saveDefaultMessages() {
 		if (MessagesFile == null) {
-			MessagesFile = new File(plugin.getDataFolder(), "Messages.yml");
+			MessagesFile = new File(plugin.getDataFolder(), msgYML);
 		}
 		if (!MessagesFile.exists()) {
-			plugin.saveResource("Messages.yml", false);
+			plugin.saveResource(msgYML, false);
 		}
 	}
 

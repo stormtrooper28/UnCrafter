@@ -1,13 +1,26 @@
 # Config for UnCrafter
 # _
+# English by default (EN) "Messages.yml"
+
+# French (FR) "FRMessages.yml"
+# FRENCH TRANSLATION BY: DomMinesDiamonds AT https://www.spigotmc.org/members/domminesdiamonds.57725/
+
+# German (DE) "DEMessages.yml"
+# GERMAN TRANSLATION BY: HerrFreakey https://www.spigotmc.org/members/herrfreakey.42048/
+
+# Spanish (ES) "ESMessages.yml"
+# SPANISH TRANSLATION BY: MrPlug https://www.spigotmc.org/members/mrplug.74032/
+
+# are the only supported languages, if you have another language, you can send me a translation or overwrite english.
+# _
 # If Permissions aren't used, this plugin will allow all users to uncraft and all OPs to update and check
 # UnCrafting permission: "uncrafter.use.crafting"
 # UnSmelting permission: "uncrafter.use.smelting"
 # UnBrewing permission: "uncrafter.use.brewing"
 # UnEnchanting permission: "uncrafter.use.enchanting"
 # UnTrading permission: "uncrafter.use.trading"
+# Permission to use uncrafting / unsmelting command: "uncrafter.command"
 # Permission to get notified if an update is available: "uncrafter.update.notify"
-# Permission to automatically update this plugin: "uncrafer.update.download"
 # _
 # (Dis-)Allowing UnCrafting (and other Un- processes) is just as it sounds. Whether this part of the plugin is enabled
 # _
@@ -27,7 +40,9 @@
 # Case DOES Matter For Worlds!
 
 
-config_version: 1.8
+config_version: 1.9
+
+language: EN
 
 allow_uncrafting: true
 

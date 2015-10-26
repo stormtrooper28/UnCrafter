@@ -38,9 +38,13 @@ Fixed config version and deletions not being used correctly
 More Metrics Support
 
 Version 1.9f
-You can now open unenchanting inventories
-(I might've done the same with unbrewing)
-but they doesn't do anything
-I've begun the full implementation of custom uncrafting tables
+Language Support: French COURTESY OF DomMinesDiamonds AT https://www.spigotmc.org/members/domminesdiamonds.57725/
+Language Support: German COURTESY OF HerrFreakey AT https://www.spigotmc.org/members/herrfreakey.42048/
+Language Support: Spanish COURTESY OF MrPlug AT https://www.spigotmc.org/members/mrplug.74032/
 
+Added Config option to choose your language
+Added Support of color codes with '&'
+Added UnCraft / UnSmelt item in hand command and permission
+Removed hardcoded enchantment message
+PLEASE DELETE YOUR OLD CONFIG.YML !!! (I won't automatically delete it so your config isn't reset. Perhaps in the next version I'll add automatic config updating)
 

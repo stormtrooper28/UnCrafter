@@ -1,0 +1,21 @@
+# Customize your messages!
+# Color Codes using the & symbol are now supported
+# _
+# GERMAN TRANSLATION BY: HerrFreakey https://www.spigotmc.org/members/herrfreakey.42048/
+ 
+  
+default_update_news: "Das einzige was neu ist, sind die Funktionen, die du noch nicht entdeckt hast."
+no_updates_available: "[AutoUpdater] Zurzeit ist kein neues Update verfügbar."
+blacklist_not_found: "Die Blacklist konnte nicht gefunden werden, verwende Kohleerz,Redstoneerz, Lapis Lazuli Erz und Quartz Erz."
+world_include_list_invalid: "Die Liste mit den aktivierten Welten wurde nicht gefunden. Daher wurde diese Funktion deaktiviert."
+world_exclude_list_invalid: "Die Liste mit den deaktivierten Welten wurde nicht gefunden. Daher wurde diese Funktion deaktiviert."
+checking_updates: "Suche nach Updates..."
+update_check_failed: "AutoUpdate Check fehgeschlagen."
+update_check_complete: "Update Check erfolgreich."
+unBrewing_is_unsupported: "☢ UnBrewing ist zurzeit nicht möglich, aber geplant. Bitte warte auf ein Update! ☢"
+unEnchanting_is_unsupported: "☢ UnEnchanting ist zurzeit nicht möglich, aber geplant. Bitte warte auf ein Update! ☢"
+unTrading_is_unsupported: "☢ UnTrading ist zurzeit nicht möglich, aber geplant. Bitte warte auf ein Update! ☢"
+not_enough_items_for_uncrafting: "Du hast nicht genug Items um das Craften rückgängig zu machen!"
+not_enough_items_for_unsmelting: "Du hast nicht genug Items um das Schmelzen rückgäng zu machen!"
+uncrafting_item_lost: "UnCrafting fehlgeschlagen. Du hast folgendes verloren: "
+unsmelting_item_lost: "UnSmelting fehlgeschlagen. Du hast folgendes verloren: "
