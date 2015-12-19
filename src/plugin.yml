@@ -1,0 +1,37 @@
+name: UnCrafter
+main: github.stormtrooper28.unCrafter.UnCrafter
+version: 1.9f
+description: Uncraft your items!
+author: stormtrooper28
+prefix: UnCrafter
+website: http://troopcraft.enjin.com
+
+commands:
+    uncraft:
+        description: This command is used to UnCraft / UnSmelt the item in hand!
+        usage: /uncraft with an item in hand
+        aliases: [uc,unsmelt,us,unenchant,ue,unbrew,ub,untrade, ut]
+
+permissions:
+    uncrafter.crafting:
+        default: true
+        description: Gives access to uncrafting
+    uncrafter.smelting:
+        default: true
+        description: Gives access to unsmelting
+    uncrafter.brewing:
+        default: true
+        description: Gives access to unbrewing
+    uncrafter.enchanting:
+        default: true
+        description: Gives access to unenchanting
+    uncrafter.trading:
+        default: true
+        description: Gives access to untrading
+    uncrafter.command:
+        default: true
+        description: Gives access to uncrafting / unsmelting command
+    uncrafter.update.notify:
+        default: op
+        description: Is told if update is available
+

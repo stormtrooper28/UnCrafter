@@ -1,0 +1,20 @@
+# Customize your messages! 
+# Color Codes using the & symbol are now supported
+# (Spanish, German, French, Dutch, and Hebrew are already supported!)
+
+
+default_update_news: "The only thing new is what you haven't found from the version already on this server."
+no_updates_available: "[AutoUpdater] No update available... as of yet."
+blacklist_not_found: "Blacklist could not be found, defaulting to coal ore, redstone ore, lapis ore, and quartz ore."
+world_include_list_invalid: "Include list for worlds could not be found or is invalid, disabling this feature"
+world_exclude_list_invalid: "Exclude list for worlds could not be found or is invalid, disabling this feature"
+checking_updates: "Checking for Updates..."
+update_check_failed: "AutoUpdate check failed."
+update_check_complete: "Update Check complete."
+unBrewing_is_unsupported: "☢ UnBrewing is currently UnSupported but planned, please wait for the update! ☢"
+unEnchanting_is_unsupported: "☢ UnEnchanting is currently UnSupported but planned, please wait for the update! ☢"
+unTrading_is_unsupported: "☢ UnTrading is currently UnSupported but planned, please wait for the update! ☢"
+not_enough_items_for_uncrafting: "You do not have enough items for the uncrafting process!"
+not_enough_items_for_unsmelting: "You do not have enough items for the unsmelting process!"
+uncrafting_item_lost: "UnCrafting failed, you have lost your "
+unsmelting_item_lost: "UnSmelting failed, you have lost your "

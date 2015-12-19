@@ -1,0 +1,56 @@
+Version 1.4f
+Fixed config.yml comments (directions / help)
+Fixed bug where item clicked with was treated and used as result of recipe
+Fixed bug where you could not uncraft an item, unless you had enough of it for all its uncrafting recipes
+Fixed bug where you would run through all uncrafting recipes for the particular item, instead of just a random 1 each time
+Fixed messages and attempted to make messages easier to understand. 
+Fixed multiple data value bugs (durability)
+Unregistered UnCrafter command as it has no use and there are no plans to use it
+Various unrecorded bug fixes
+
+Added config version for update purposes
+Added configurable Blacklist
+Added custom message system! All that's left is for uses to send me their translations!
+Added Per-World include / exclude lists!
+Added semi-hidden changelog.txt
+Added support for items with multiple data values: oak versus jungle wood, andesite versus smooth stone, etc... (durability), old config should still work
+Added support for vanilla tools, weapons, and armours' recycled based on remaining durability (Always rounded down). This only supports vanilla tools.
+AutoDownload option has been finished! At long last!
+
+Note: There are no known or expected bugs in the this plugin unless you choose to enable the auto download and install option
+
+Version 1.5f
+Fixed Changelog version-ing
+
+Version 1.6f
+Removed auto download as it was unstable, unsupported, and took up 10kb of space! (And Bukkit shunned UnCrafter for it)
+
+Version 1.7f
+Complete ReWrite!!!
+Added ability to disable certain portions of this plugin (UnCrafting, UnSmelting, etc...)
+Added Metrics so I understand who is using this plugin and truly admire how many are using this!
+Clipped Messages.yml so that only used messages are left
+SaveData.yml and support for it have been replaced with an internal and more efficient. If it is not automatically deleted, try to do so manually.
+UNDER 1000 LINES!!! (Excluding Metrics)
+
+Version 1.8f
+Fixed config version and deletions not being used correctly
+More Metrics Support
+
+Version 1.9f
+Language Support: French COURTESY OF DomMinesDiamonds AT https://www.spigotmc.org/members/domminesdiamonds.57725/
+Language Support: German COURTESY OF HerrFreakey AT https://www.spigotmc.org/members/herrfreakey.42048/
+Language Support: Spanish COURTESY OF MrPlug AT https://www.spigotmc.org/members/mrplug.74032/
+
+Added Config option to choose your language
+Added Support of color codes with '&'
+| Added UnCraft / UnSmelt item in hand command and permission
+? Removed hardcoded enchantment message
+PLEASE DELETE YOUR OLD CONFIG.YML !!! (I won't automatically delete it so your config isn't reset. Perhaps in the next version I'll add automatic config updating)
+
+Version 2.0f
+| UnEnchanting
+| UnBrewing
+? Commands
+| a help section
+? and support for ProtocolLib, PacketListenerApi, or neither.

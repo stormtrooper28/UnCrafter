@@ -9,7 +9,6 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -23,6 +22,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,14 +46,19 @@ import github.stormtrooper28.unCrafter.Actions.OpenInv;
 import github.stormtrooper28.unCrafter.Actions.UnDo;
 import github.stormtrooper28.unCrafter.Metrics.Metrics;
 import github.stormtrooper28.unCrafter.Metrics.Metrics.Graph;
-import github.stormtrooper28.unCrafter.Packets.Reflection;
-import github.stormtrooper28.unCrafter.Packets.Reflection.FieldAccessor;
-import github.stormtrooper28.unCrafter.Packets.Reflection.MethodInvoker;
+import github.stormtrooper28.unCrafter.Packets.RegisterDefaultPackets;
+import github.stormtrooper28.unCrafter.Packets.RegisterPacketListenerApiPackets;
+import github.stormtrooper28.unCrafter.Packets.RegisterProtcolLibPackets;
 import github.stormtrooper28.unCrafter.Packets.TinyProtocol;
 import github.stormtrooper28.unCrafter.Utils.AutoUpdater;
-import io.netty.channel.Channel;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent.ChatSerializer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutOpenWindow;
+import net.minecraft.server.v1_8_R3.PacketPlayOutWindowData;
 
 public class UnCrafter extends JavaPlugin implements Listener {
+	Boolean tempFalse = 0==1;
+	
 	// Messages Config
 	// * * * * * * * * * * * * * * * * * * * *
 
@@ -115,47 +120,6 @@ public class UnCrafter extends JavaPlugin implements Listener {
 
 	public static List<Entity> villagerList = new ArrayList<>();
 
-	// Chat packets
-	private FieldAccessor<String> Call_Chat = Reflection.getField("{nms}.PacketPlayInChat", String.class, 0);
-
-	// My Window packet
-	private Class<?> windowClass = Reflection.getClass("{nms}.PacketPlayOutOpenWindow");
-	private FieldAccessor<Byte> windowID = Reflection.getField(windowClass, Byte.class, 0);
-	private FieldAccessor<Float> windowType = Reflection.getField(windowClass, float.class, 0);
-	private FieldAccessor<String> windowName = Reflection.getField(windowClass, String.class, 0);
-	private FieldAccessor<Byte> windowSlotCount = Reflection.getField(windowClass, Byte.class, 0);;
-
-	// General WindowOut packet
-	private Class<?> eventWindowClass = Reflection.getClass("{nms}.PacketPlayOutOpenWindow");
-	private FieldAccessor<Byte> eventWindowID = Reflection.getField(windowClass, Byte.class, 0);
-	private Byte windowCount = 0;
-
-	// net.minecraft.server.ItemStack
-	private Class<Object> nmsStackClass = Reflection.getUntypedClass("{nms}.ItemStack");
-
-	// General WindowClick
-	private Class<?> invClickPacket = Reflection.getClass("{nms}.PacketPlayInWindowClick");
-
-	// Convert an NMS item stack to a CraftBukkit item stack
-	private MethodInvoker getItemStack = Reflection.getMethod("{obc}.inventory.CraftItemStack", "asCraftMirror",
-			nmsStackClass);
-
-	// 0 is the player inventory
-	private FieldAccessor<Integer> invClickWindowId = Reflection.getField(invClickPacket, int.class, 0);
-	private FieldAccessor<Integer> invClickSlotIndex = Reflection.getField(invClickPacket, int.class, 1);
-	private FieldAccessor<Integer> invClickButton = Reflection.getField(invClickPacket, int.class, 2);
-	private FieldAccessor<Short> invClickActionNumber = Reflection.getField(invClickPacket, short.class, 0);
-	private FieldAccessor<Object> invClickItemStack = Reflection.getField(invClickPacket, nmsStackClass, 0);
-	private FieldAccessor<Integer> invClickClickMode = Reflection.getField(invClickPacket, int.class, 3);
-
-	private static HashMap<Byte, Player> invIdtoPlayer = new HashMap<>();
-
-	// General WindowClick
-	private Class<?> invClosePacket = Reflection.getClass("{nms}.PacketPlayInCloseWindow");
-
-	// 0 is the player inventory
-	private FieldAccessor<Integer> invCloseWindowId = Reflection.getField(invClosePacket, int.class, 0);
-
 	private TinyProtocol protocol;
 
 	@Override
@@ -179,13 +143,32 @@ public class UnCrafter extends JavaPlugin implements Listener {
 
 		getServer().getPluginManager().registerEvents(this, this);
 
-		getMessages().options().copyDefaults(true);
-		saveDefaultMessages();
-
 		saveDefaultConfig();
 		getConfig().options().copyHeader(true);
 		getConfig().options().copyDefaults(true);
 		saveConfig();
+
+		String preLang = "en";
+
+		if (getConfig().get("language") != null)
+			preLang = getConfig().getString("language");
+		else
+			getConfig().set("language", "EN");
+
+		if (preLang.toLowerCase().startsWith("s") || preLang.toLowerCase().startsWith("es"))
+			msgYML = "ESMessages.yml";
+		else if (preLang.toLowerCase().startsWith("g") || preLang.toLowerCase().startsWith("d"))
+			msgYML = "DEMessages.yml";
+		else if (preLang.toLowerCase().startsWith("f"))
+			msgYML = "FRMessages.yml";
+		else
+			msgYML = "Messages.yml";
+		getLogger().info("Using " + msgYML);
+		System.err.println("Using " + msgYML);
+		reloadMessages();
+
+		getMessages().options().copyDefaults(true);
+		saveDefaultMessages();
 
 		iniMessages();
 
@@ -223,25 +206,7 @@ public class UnCrafter extends JavaPlugin implements Listener {
 
 			@Override
 			public void run() {
-				reloadMessages();
 				reloadConfig();
-
-				String preLang = "en";
-
-				if (getConfig().get("allow_uncrafting") != null)
-					preLang = getConfig().getString("language");
-				else
-					getConfig().set("language", "EN");
-
-				if (preLang.toLowerCase().startsWith("s") || preLang.toLowerCase().startsWith("es"))
-					msgYML = "ESMessages.yml";
-				else if (preLang.toLowerCase().startsWith("g") || preLang.toLowerCase().startsWith("d"))
-					msgYML = "DEMessages.yml";
-				else if (preLang.toLowerCase().startsWith("f"))
-					msgYML = "FRMessages.yml";
-				else
-					msgYML = "Messages.yml";
-				getLogger().info("Using " + msgYML);
 
 				/* 1 */if (getConfig().get("allow_uncrafting") != null)
 					UnCrafter.allow_uncrafting = getConfig().getBoolean("allow_uncrafting");
@@ -421,108 +386,62 @@ public class UnCrafter extends JavaPlugin implements Listener {
 
 			metrics.start();
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		
+		if(Bukkit.getPluginManager().getPlugin("ProtocolLib") != null && Bukkit.getPluginManager().getPlugin("ProtocolLib").isEnabled() && tempFalse){
+			if(!tryProtocolLib())
+				Bukkit.broadcastMessage("Disabling Plugin (ProtcolLib) should happen here!!!");
+			else
+				getLogger().info("ProtocolLib was found and successfully hooked into!");
+		}
+		else if(Bukkit.getPluginManager().getPlugin("PacketListenerApi") != null && Bukkit.getPluginManager().getPlugin("PacketListenerApi").isEnabled() && tempFalse){
+			if(!tryPacketListenerApi())
+				Bukkit.broadcastMessage("Disabling Plugin (PacketListenerApi) should happen here!!!");			
+			else
+				getLogger().info("PacketListenerApi was found and successfully hooked into!");
+		}
+		else
+			if(!tryDefaultPacket())
+				Bukkit.broadcastMessage("Disabling Plugin (Default) should happen here!!!");
+			else
+				getLogger().info("No supported proxy service found! Successfully enabled backup proxy!");
 
-		protocol = new TinyProtocol(this) {
-
-			@Override
-			public Object onPacketInAsync(final Player sender, Channel channel, final Object packet) {
-				// Cancel chat packets
-				if (Call_Chat.hasField(packet)) {
-					if (Call_Chat.get(packet).contains("dirty")) {
-						Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-							@Override
-							public void run() {
-								openEnchantWindow(sender);
-
-							}
-						});
-						return null;
-					}
-				}
-
-				if (windowName.hasField(packet)) {
-					System.out.println("Sending window field:" + packet);
-				}
-
-				if (invClickWindowId.hasField(packet) && invIdtoPlayer.containsKey(invClickWindowId.get(packet))) {
-					Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-						@Override
-						public void run() {
-							onInvClickPacket(invClickActionNumber.get(packet), invClickButton.get(packet),
-									invClickClickMode.get(packet),
-									(ItemStack) getItemStack.invoke(null, invClickItemStack.get(packet)),
-									invClickSlotIndex.get(packet), invClickWindowId.get(packet));
-
-						}
-					});
-
-					return null;
-
-				}
-
-				return super.onPacketInAsync(sender, channel, packet);
-			}
-
-			public Object onPacketOutAsync(Player reciever, Channel channel, Object packet) {
-				if (eventWindowClass.isInstance(packet)) {
-					Object winID = eventWindowID.get(packet);
-
-					windowCount = (Byte) winID;
-
-					invIdtoPlayer.put(windowCount, reciever);
-
-					// Which is equivalent to:
-					// serverPing.get(packet).setPlayerSample(new
-					// ServerPingPlayerSample(1000, 0));
-					return packet;
-				}
-
-				if (invCloseWindowId.hasField(packet))
-					invIdtoPlayer.remove(invCloseWindowId.get(packet));
-
-				return super.onPacketOutAsync(reciever, channel, packet);
-			}
-
-		};
-		for (Player preP : Bukkit.getServer().getOnlinePlayers())
-			protocol.injectPlayer(preP);
 	}
 
+	private Boolean tryProtocolLib(){
+		try {
+			new RegisterProtcolLibPackets().onEnable(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}		
+		return true;
+	}
+
+	private Boolean tryPacketListenerApi(){
+		try {
+			new RegisterPacketListenerApiPackets().onEnable(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}		
+		return true;
+	}
+
+	private Boolean tryDefaultPacket(){
+		try {
+			protocol = new RegisterDefaultPackets().onEnable(protocol, this);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}		
+		return true;
+	}
+	
 	@EventHandler
 	public void playerInjecting(PlayerJoinEvent e) {
 		protocol.injectPlayer(e.getPlayer());
-	}
-
-	// invClickActionNumber, invClickButton, invClickClickMode,
-	// invClickItemStack, invClickSlotIndex, invClickWindowId
-
-	protected void onInvClickPacket(Short actionNumber, Integer button, Integer clickMode, Object itemStack,
-			Integer slotIndex, Integer windowId) {
-		// TODO Auto-generated method stub
-		System.out.println("Cancelled Incoming Click");
-	}
-
-	protected void openEnchantWindow(Player player) {
-		System.out.println("ddiirrttyy");
-
-		try {
-			// Only visible for the client
-			Object windowPacket = windowClass.newInstance();
-
-			windowName.set(windowPacket, "UnEnchanter");
-			windowID.set(windowPacket, 255);
-			windowSlotCount.set(windowPacket, 37);
-			windowType.set(windowPacket, "4");
-
-			// Send the packet to the player
-			protocol.sendPacket(player, windowPacket);
-		} catch (Exception e) {
-			throw new RuntimeException("Cannot send packet.", e);
-		}
-
 	}
 
 	@Override
@@ -534,9 +453,87 @@ public class UnCrafter extends JavaPlugin implements Listener {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
-		if (sender instanceof Player && cmd.toString().equalsIgnoreCase("uncraft")) {
-			if ((usePerm && sender.hasPermission("uncrafter.command")) || sender.isOp()) {
+		 if (sender instanceof Player) {
+	            if (args.length == 1) {
+	                switch (args[0]) {
+	                case "1":
+	                    sender.sendMessage("Try first option");
+	                    ((Player) sender).openEnchanting(null, true);
+	                    break;
+	                case "2":
+	                    sender.sendMessage("Try second option");
+	                    ((Player) sender).openEnchanting(null, false);
+	                    break;
+	                case "3":
+	                    sender.sendMessage("Try third option");
+	                    ((Player) sender).openEnchanting(((Player) sender).getLocation().clone().add(1.0D, 0.0D, 0.0D), true);
+	                    break;
+	                case "4":
+	                    sender.sendMessage("Try fourth option");
+	                    ((Player) sender).openEnchanting(((Player) sender).getLocation().clone().add(1.0D, 0.0D, 0.0D), false);
+	                    break;
+	                case "5":
+	                    sender.sendMessage("Try fivth option");
+	                    ((Player) sender).openInventory(Bukkit.createInventory(null, InventoryType.ENCHANTING));
+	                    break;
+	                case "6":
+	                    sender.sendMessage("Try sixth option");
+	                    EntityPlayer NMSPlayer1 = ((CraftPlayer) (Player) sender).getHandle();
+	                    /* Open Window Packet:
+	                     * http://wiki.vg/Protocol#Open_Window
+	                     * Window ID: unique id number for the window to be displayed. Notchian server implementation is a counter, starting at 1.
+	                     * Window Type  String  The window type to use for display. See http://wiki.vg/Inventory for a list.
+	                     * Window Title: The title of the window.
+	                     * Number Of Slots: Number of slots in the window (excluding the number of slots in the player inventory).
+	                     * Entity ID: [OPTIONAL] EntityHorse's EID. Only sent when Window Type is “EntityHorse”.
+	                     */
+	                    NMSPlayer1.playerConnection.sendPacket(new PacketPlayOutOpenWindow(1, "minecraft:enchanting_table", ChatSerializer.a("Test")));
+	                    break;
+	                case "7":
+	                    sender.sendMessage("Try seventh option");
+	                    EntityPlayer NMSPlayer2 = ((CraftPlayer) (Player) sender).getHandle();
+	                    // First open as in option 6
+	                    NMSPlayer2.playerConnection.sendPacket(new PacketPlayOutOpenWindow(1, "minecraft:enchanting_table", ChatSerializer.a("Test")));
+	                    /* Window Property Packet:
+	                     * http://wiki.vg/Protocol#Window_Property
+	                     * Window ID: ID as assigned above.
+	                     * Property: The property to be updated, 0 to 6.
+	                     * Value: The new value for the property.
+	                     * 0: Level requirement for top enchantment slot.
+	                     * 1: Level requirement for middle enchantment slot.
+	                     * 2: Level requirement for bottom enchantment slot.
+	                     * 3: The seed for generating the enchantments view for the client. Function Unknown.
+	                     * 4: tooltip shown on mouse hover over top enchantment slot. Function Unknown (set to -1 to hide it).
+	                     * 5: tooltip shown on mouse hover over middle enchantment slot. Function Unknown (set to -1 to hide it).
+	                     * 6: tooltip shown on mouse hover over bottom enchantment slot. Function Unknown (set to -1 to hide it).
+	                     */
+	                    int[] Data = {1, 2, 3, 64, 1, 1, 1}; // Interpret values as in comment above.
+	                    for (int i = 0; i < 7; i++) NMSPlayer2.playerConnection.sendPacket(new PacketPlayOutWindowData(1, i, Data[i]));
+	                    break;
+	                }
+	            /* RESULTS:
+	             * 1.: Successfully opens enchanting inventory, but generating enchantment options causes error.
+	             * 2.: Error, because there is no table location and parameter "false" won't force an new empty one.
+	             * 3.: Successfully opens enchanting Inventory. Generation of enchantment options causes error, IF the Block at location is NOT a enchanting table
+	             * 4.: Opens enchanting Inventory only, if the Block at locations is a enchantment table. Then enchantments are generated successfully.
+	             * 5.: Successfully opens enchanting inventory, but no enchantments will be generated (no error).
+	             * 6.: Successfully opens enchanting inventory, but no enchantments will be generated (no error).
+	             * 7.: Successfully opens enchanting inventory, enchantments will be shown as defined WITHOUT any tool. No new enchantments will be generated.
+	             */
+	            }
+	        }
+		
+		if (sender instanceof Player && alias.equalsIgnoreCase("uncraft")) {
+			boolean cont = false;
+			if ((usePerm && sender.hasPermission("uncrafter.command")))
+				cont = true;
+			if (sender.isOp())
+				cont = true;
+			if (cont) {
 				Player p = (Player) sender;
+				System.out.println(p);
+				if (p.getItemInHand() == null || p.getItemInHand().getType() == Material.AIR)
+					return false;
 				ItemStack item = p.getItemInHand();
 				short dura = item.getDurability();
 				String name = item.getType().toString();
@@ -546,9 +543,8 @@ public class UnCrafter extends JavaPlugin implements Listener {
 					return false;
 				SlotType sType = SlotType.QUICKBAR;
 				Inventory inv = p.getInventory();
-				p.openInventory(inv);
 				UnDo.unCraftSmelt(item, name, p, sType, inv, inv, inv);
-				p.closeInventory();
+				System.out.println("endcommand");
 			}
 			return true;
 		}

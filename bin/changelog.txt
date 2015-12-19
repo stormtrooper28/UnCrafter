@@ -44,7 +44,13 @@ Language Support: Spanish COURTESY OF MrPlug AT https://www.spigotmc.org/members
 
 Added Config option to choose your language
 Added Support of color codes with '&'
-Added UnCraft / UnSmelt item in hand command and permission
-Removed hardcoded enchantment message
+| Added UnCraft / UnSmelt item in hand command and permission
+? Removed hardcoded enchantment message
 PLEASE DELETE YOUR OLD CONFIG.YML !!! (I won't automatically delete it so your config isn't reset. Perhaps in the next version I'll add automatic config updating)
 
+Version 2.0f
+| UnEnchanting
+| UnBrewing
+? Commands
+| a help section
+? and support for ProtocolLib, PacketListenerApi, or neither.
