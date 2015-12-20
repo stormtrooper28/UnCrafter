@@ -9,8 +9,8 @@ website: http://troopcraft.enjin.com
 commands:
     uncraft:
         description: This command is used to UnCraft / UnSmelt the item in hand!
-        usage: /uncraft with an item in hand
-        aliases: [uc,unsmelt,us,unenchant,ue,unbrew,ub,untrade, ut]
+        usage: /GuiGame
+        aliases: [uc,unsmelt,unenchant,unbrew,untrade]
 
 permissions:
     uncrafter.crafting:

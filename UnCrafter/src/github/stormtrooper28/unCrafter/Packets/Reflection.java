@@ -174,12 +174,7 @@ public final class Reflection {
 		if (target.getSuperclass() != null)
 			return getField(target.getSuperclass(), name, fieldType, index);
 
-		try{
 		throw new IllegalArgumentException("Cannot find field with type " + fieldType);
-		}catch(Exception e){
-			e.printStackTrace();
-			throw new IllegalArgumentException("FieldType is invalid!");
-		}
 	}
 
 	/**

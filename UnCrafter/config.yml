@@ -2,22 +2,16 @@
 # _
 # English by default (EN) "Messages.yml"
 
-# Spanish (ES) "ESMessages.yml"
-# SPANISH TRANSLATION BY: MrPlug https://www.spigotmc.org/members/mrplug.74032/
+# French (FR) "FRMessages.yml"
+# FRENCH TRANSLATION BY: DomMinesDiamonds AT https://www.spigotmc.org/members/domminesdiamonds.57725/
 
 # German (DE) "DEMessages.yml"
 # GERMAN TRANSLATION BY: HerrFreakey https://www.spigotmc.org/members/herrfreakey.42048/
 
-# French (FR) "FRMessages.yml"
-# FRENCH TRANSLATION BY: DomMinesDiamonds AT https://www.spigotmc.org/members/domminesdiamonds.57725/
+# Spanish (ES) "ESMessages.yml"
+# SPANISH TRANSLATION BY: MrPlug https://www.spigotmc.org/members/mrplug.74032/
 
-# Dutch (NL) "NLMessages.yml"
-# DUTCH TRANSLATION BY finnbon AT https://www.spigotmc.org/members/finnbon.37739/
-
-# Hebrew (HE) "HEMessages.yml"
-# HEBREW TRANSLATION BY NonameSL AT https://www.spigotmc.org/members/nonamesl.39245/
-
-# are the only supported languages, if you have another language, you can send me a translation or overwrite the default.
+# are the only supported languages, if you have another language, you can send me a translation or overwrite english.
 # _
 # If Permissions aren't used, this plugin will allow all users to uncraft and all OPs to update and check
 # UnCrafting permission: "uncrafter.use.crafting"
@@ -53,10 +47,6 @@ language: EN
 allow_uncrafting: true
 
 allow_unsmelting: true
-
-allow_unenchanting: true
-
-allow_unbrewing: true
 
 use_permissions: false
 

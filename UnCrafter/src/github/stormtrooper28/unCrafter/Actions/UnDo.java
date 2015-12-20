@@ -153,12 +153,8 @@ public class UnDo {
 					p.sendMessage(UnCrafter.unsmelting_item_lost + item.getType().name().toLowerCase());
 					break;
 				}
-			if (p.getItemOnCursor() != null)
-				p.setItemOnCursor(new ItemStack((leftover > 0) ? (item.getType()) : (Material.AIR),
-						((leftover > 0) ? leftover : 1), item.getDurability()));
-			else
-				p.setItemInHand(new ItemStack((leftover > 0) ? (item.getType()) : (Material.AIR),
-						((leftover > 0) ? leftover : 1), item.getDurability()));
+			p.setItemOnCursor(new ItemStack((leftover > 0) ? (item.getType()) : (Material.AIR),
+					((leftover > 0) ? leftover : 1), item.getDurability()));
 		} else
 			p.sendMessage((recipe instanceof FurnaceRecipe) ? UnCrafter.not_enough_items_for_unsmelting
 					: UnCrafter.not_enough_items_for_uncrafting);
@@ -217,10 +213,7 @@ public class UnDo {
 			else
 				inv.addItem(item);
 		}
-		if(p.getItemOnCursor() != null)
-			p.setItemOnCursor(new ItemStack(itemInQ.getType(), itemInQ.getAmount() - 1, itemInQ.getDurability()));
-		else
-			p.setItemInHand(new ItemStack(itemInQ.getType(), itemInQ.getAmount() - 1, itemInQ.getDurability()));
+		p.setItemOnCursor(new ItemStack(itemInQ.getType(), itemInQ.getAmount() - 1, itemInQ.getDurability()));
 
 		p.updateInventory();
 		return true;
